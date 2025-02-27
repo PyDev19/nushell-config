@@ -1,23 +1,23 @@
 def left_prompt [] {
+    mut prompt = [];
+    $prompt = $prompt | append $"(ansi cyan)╭─"
+
     let folder_name = $env.PWD | path basename
-    let folder_name_display = $"(ansi purple)[  ($folder_name) ](ansi cyan)"
+    $prompt = $prompt | append $"(ansi purple)[  ($folder_name) ](ansi cyan)"
 
-    let is_git_repo = [$env.PWD, "\\.git"] | str join | path exists
-    let git_branch = if $is_git_repo {
-        $"-(ansi red)[ 󰘬 (git branch --show-current | str trim) ](ansi cyan)"
-    } else {
-        ""
+    if ([$env.PWD, "\\.git"] | str join | path exists) {
+        $prompt = $prompt | append $"-(ansi red)[ 󰘬 (git branch --show-current | str trim) ](ansi cyan)"
     }
 
-    let venv = try { $env.VIRTUAL_ENV_PROMPT } catch { "" }
-    let venv_display = if $venv != "" {
+    try {
+        let venv = $env.VIRTUAL_ENV_PROMPT
         let python_version = python --version | str trim | split row " " | get 1
-        $"-(ansi blue)[  ($venv) v($python_version) ]"
-    } else {
-        ""
-    }
+        $prompt = $prompt | append $"-(ansi blue)[  ($venv) v($python_version) ]"
+    } catch { "" }
+
+    $prompt = $prompt | append $"(ansi cyan)\n╰─ "
     
-    [(ansi cyan), "╭─", $folder_name_display, $git_branch, $venv_display, (ansi cyan), "\n╰─ "] | str join
+    $prompt | str join
 }
 
 $env.PROMPT_COMMAND = { || left_prompt }
