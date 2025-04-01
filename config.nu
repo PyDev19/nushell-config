@@ -1,3 +1,30 @@
+def --env load-vcvars [arch: string = "x64"] {
+    if ($nu.os-info.family != "windows") {
+        print "load-vcvars only works on windows"
+        return
+    }
+
+    let env_vars = do { 
+        cmd.exe /c $"call vcvarsall.bat ($arch) && set"
+    } | lines | parse "{key}={value}"
+
+    for row in $env_vars {
+        let key = $row.key | str trim
+        let value = $row.value | str trim
+
+        if $key == "Path" {
+            let msvc_paths = $value | split row ";"
+            let new_path = $env | get 'Path' | prepend $msvc_paths
+            let new_env = {
+                'Path' : $new_path
+            }
+            load-env $new_env
+        }
+    }
+
+    print "MSVC environment variables loaded."
+}
+
 def left_prompt [] {
     mut prompt = [];
     $prompt = $prompt | append $"(ansi cyan)╭─"
