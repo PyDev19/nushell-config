@@ -8,21 +8,28 @@ def --env load-vcvars [arch: string = "x64"] {
         cmd.exe /c $"call vcvarsall.bat ($arch) && set"
     } | lines | parse "{key}={value}"
 
+    mut new_env = {}
+
     for row in $env_vars {
         let key = $row.key | str trim
         let value = $row.value | str trim
 
+        if $key == "PWD" {
+            continue
+        }
+
         if $key == "Path" {
-            let msvc_paths = $value | split row ";"
-            let new_path = $env | get 'Path' | prepend $msvc_paths
-            let new_env = {
-                'Path' : $new_path
-            }
-            load-env $new_env
+            let paths = $value | split row ";"
+            let new_value = $env | get $key | prepend $paths
+            $new_env = ($new_env | upsert $key $paths)
+        } else {
+            $new_env = ($new_env | upsert $key $value)
         }
     }
 
-    print "MSVC environment variables loaded."
+    load-env $new_env
+
+    print $"MSVC environment variables loaded for ($arch)."
 }
 
 def left_prompt [] {
