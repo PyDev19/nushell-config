@@ -34,7 +34,7 @@ def --env load-vcvars [arch: string = "x64"] {
 
 def left_prompt [] {
     mut prompt = [];
-    $prompt = $prompt | append $"(ansi cyan)╭─"
+    $prompt = $prompt | append $"(ansi cyan)"
 
     let folder_name = $env.PWD | path basename
     $prompt = $prompt | append $"(ansi purple)[  ($folder_name) ](ansi cyan)"
@@ -49,7 +49,7 @@ def left_prompt [] {
         $prompt = $prompt | append $"-(ansi blue)[  ($venv) v($python_version) ]"
     } catch { "" }
 
-    $prompt = $prompt | append $"(ansi cyan)\n╰─ "
+    $prompt = $prompt | append $"(ansi cyan)\n─ "
     
     $prompt | str join
 }

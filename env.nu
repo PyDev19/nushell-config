@@ -20,3 +20,8 @@
 $env.config.buffer_editor = "code"
 $env.config.show_banner = false
 $env.VIRTUAL_ENV_DISABLE_PROMPT = true
+$env.JAVA_HOME = "C:/Users/athar/AppData/Local/Programs/Eclipse Adoptium/jdk-17.0.14.7-hotspot"
+
+def --wrapped conda [...args: string] { ~/miniconda3/condabin/conda.bat ...$args }
+
+use ./conda.nu
